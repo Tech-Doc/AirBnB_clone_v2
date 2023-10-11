@@ -1,35 +1,30 @@
 #!/usr/bin/env bash
-# Sets up a web server for deployment of web_static.
+# script that sets up your web servers for the deployment of web_static
 
-sudo apt-get update
-sudo apt-get install -y nginx
+# install nginx if not previosul installed
+if [ ! -x /usr/sbin/nginx ]; then
+	sudo apt-get update -y -qq && \
+		sudo apt-get install -y nginx
+fi
 
-sudo mkdir -p /data/web_static/releases/test/
-sudo mkdir -p /data/web_static/shared/
-echo "Holberton School" | sudo tee /data/web_static/releases/test/index.html
+# create directories using -p
+sudo mkdir -p /data/web_static/releases/test /data/web_static/shared/
+
+# Create a fake HTML file
+echo "<h2 style='text-align:center'>Welcome to tech-doc.tech</h2>" | sudo dd status=none of=/data/web_static/releases/test/index.html
+
+# create a symbolic link
 sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
 
-sudo chown -R ubuntu /data/
-sudo chgrp -R ubuntu /data/
+# Give ownership
+sudo chown -R ubuntu:ubuntu /data/
 
-printf %s "server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    add_header X-Served-By $hostname;
-    root   /var/www/html;
-    index  index.html index.htm;
-    location /hbnb_static {
-        alias /data/web_static/current;
-        index index.html index.htm;
-    }
-    location /redirect_me {
-        return 301 http://github.com/Tech-Doc;
-    }
-    error_page 404 /404.html;
-    location /404 {
-      root /var/www/html;
-      internal;
-    }
-}" > /etc/nginx/sites-available/default
+# copy
+sudo cp /etc/nginx/sites-enabled/default nginx-sites-enabled_default.backup
 
+# Update the Nginx configuration
+sudo sed -i '37i\\tlocation /hbnb_static/ {\n\t\talias /data/web_static/current/;\n\t}\n' /etc/nginx/sites-available/default
+
+# Restart nginx
 sudo service nginx restart
+echo -e "Completed without error"
