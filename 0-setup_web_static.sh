@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 # Sets up a web server for deployment of web_static.
 
-apt-get update
-apt-get install -y nginx
+sudo apt-get update
+sudo apt-get install -y nginx
 
-mkdir -p /data/web_static/releases/test/
-mkdir -p /data/web_static/shared/
-echo "Holberton School" > /data/web_static/releases/test/index.html
-ln -sf /data/web_static/releases/test/ /data/web_static/current
+sudo mkdir -p /data/web_static/releases/test/
+sudo mkdir -p /data/web_static/shared/
+echo "Holberton School" | sudo tee /data/web_static/releases/test/index.html
+sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
 
-chown -R ubuntu /data/
-chgrp -R ubuntu /data/
+sudo chown -R ubuntu /data/
+sudo chgrp -R ubuntu /data/
 
 printf %s "server {
     listen 80 default_server;
@@ -23,7 +23,7 @@ printf %s "server {
         index index.html index.htm;
     }
     location /redirect_me {
-        return 301 http://github.com/besthor;
+        return 301 http://github.com/Tech-Doc;
     }
     error_page 404 /404.html;
     location /404 {
@@ -32,4 +32,4 @@ printf %s "server {
     }
 }" > /etc/nginx/sites-available/default
 
-service nginx restart
+sudo service nginx restart
